@@ -50,8 +50,6 @@ function GameOverScreen({ roundNumber, userNumber, onStartNewGame }) {
   );
 }
 
-//const deviceWidth = Dimensions.get('window').width
-
 const styles = StyleSheet.create({
   screen: {
     flex: 1,

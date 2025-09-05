@@ -76,7 +76,7 @@ function StartGameScreen({ onPickedNumber }) {
   );
 }
 
-const deviceHeight = Dimensions.get("width").height;
+const deviceHeight = Dimensions.get("window").height;
 
 const styles = StyleSheet.create({
   screen: {
