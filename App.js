@@ -1,16 +1,17 @@
-import { ImageBackground, SafeAreaView, StyleSheet, View } from "react-native";
-import StartGameScreen from "./screens/StartGameScreen";
-import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
-import GameScreen from "./screens/GameScreen";
-import Colors from "./constants/colors";
-import GameOverScreen from "./screens/GameOverScreen";
+import { ImageBackground, SafeAreaView, StyleSheet } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { useFonts } from "expo-font";
-import AppLoading from "expo-app-loading";
 import { StatusBar } from "expo-status-bar";
+import AppLoading from "expo-app-loading";
+
+import StartGameScreen from "./screens/StartGameScreen";
+import GameScreen from "./screens/GameScreen";
+import GameOverScreen from "./screens/GameOverScreen";
+import Colors from "./constants/colors";
 
 export default function App() {
-  const [userNumber, setUseNumber] = useState();
+  const [userNumber, setUserNumber] = useState();
   const [gameIsOver, setGameIsOver] = useState(true);
   const [guessRounds, setGuessRounds] = useState(0);
 
@@ -23,18 +24,18 @@ export default function App() {
     return <AppLoading />;
   }
 
-  function startGameHandler(numPicked) {
-    setUseNumber(numPicked);
+  function startGameHandler(pickedNumber) {
+    setUserNumber(pickedNumber);
     setGameIsOver(false);
   }
 
-  function gameOverHandler(numOfRounds) {
+  function gameOverHandler(numberOfRounds) {
     setGameIsOver(true);
-    setGuessRounds(numOfRounds);
+    setGuessRounds(numberOfRounds);
   }
 
-  function guessNewGameHander() {
-    setUseNumber(null);
+  function startNewGameHandler() {
+    setUserNumber(null);
     setGuessRounds(0);
   }
 
@@ -49,14 +50,14 @@ export default function App() {
       <GameOverScreen
         roundNumber={guessRounds}
         userNumber={userNumber}
-        onStartNewGame={guessNewGameHander}
+        onStartNewGame={startNewGameHandler}
       />
     );
   }
 
   return (
     <>
-      <StatusBar style="light"/>
+      <StatusBar style="light" />
       <LinearGradient
         colors={[Colors.primary700, Colors.accent500]}
         style={styles.rootScreen}

@@ -1,24 +1,30 @@
+import { useState } from "react";
 import {
   Alert,
   StyleSheet,
   TextInput,
   View,
-  Dimensions,
   useWindowDimensions,
   KeyboardAvoidingView,
   ScrollView,
 } from "react-native";
-import PrimaryButton from "../components/ui/PrimaryButton.js";
-import { useState } from "react";
+
+import PrimaryButton from "../components/ui/PrimaryButton";
+import Title from "../components/ui/Title";
+import Card from "../components/ui/Card";
+import InstructionText from "../components/ui/InstructionText";
 import Colors from "../constants/colors";
-import Title from "../components/ui/Title.js";
-import Card from "../components/ui/Card.js";
-import InstructionText from "../components/ui/InstructionText.js";
+
+const MIN_NUMBER = 1;
+const MAX_NUMBER = 99;
+const SMALL_HEIGHT_THRESHOLD = 380;
+const SMALL_MARGIN_TOP = 30;
+const DEFAULT_MARGIN_TOP = 100;
 
 function StartGameScreen({ onPickedNumber }) {
   const [enteredValue, setEnteredValue] = useState("");
 
-  const { width, height } = useWindowDimensions();
+  const { height } = useWindowDimensions();
 
   function numInputHandler(text) {
     setEnteredValue(text);
@@ -29,24 +35,31 @@ function StartGameScreen({ onPickedNumber }) {
   }
 
   function confirmButtonHandler() {
-    const choiceNumber = parseInt(enteredValue);
+    const chosenNumber = parseInt(enteredValue);
 
-    if (isNaN(choiceNumber) || choiceNumber <= 0 || choiceNumber > 99) {
-      Alert.alert("Invalid Number!", "Number has to be between 1 and 99", [
-        { text: "Okay", style: "destructive", onPress: resetInputHandler },
-      ]);
+    if (
+      isNaN(chosenNumber) ||
+      chosenNumber < MIN_NUMBER ||
+      chosenNumber > MAX_NUMBER
+    ) {
+      Alert.alert(
+        "Invalid Number!",
+        `Number has to be between ${MIN_NUMBER} and ${MAX_NUMBER}`,
+        [{ text: "Okay", style: "destructive", onPress: resetInputHandler }]
+      );
       return;
     }
 
-    onPickedNumber(choiceNumber);
+    onPickedNumber(chosenNumber);
   }
 
-  const marginTopDistance = height < 380 ? 30 : 100;
+  const marginTopDistance =
+    height < SMALL_HEIGHT_THRESHOLD ? SMALL_MARGIN_TOP : DEFAULT_MARGIN_TOP;
 
   return (
     <ScrollView style={styles.screen}>
       <KeyboardAvoidingView style={styles.screen} behavior="position">
-        <View style={[styles.rootContainer, marginTopDistance]}>
+        <View style={[styles.rootContainer, { marginTop: marginTopDistance }]}>
           <Title>Guess My Number?</Title>
           <Card>
             <InstructionText>Enter a Number</InstructionText>
@@ -75,8 +88,6 @@ function StartGameScreen({ onPickedNumber }) {
     </ScrollView>
   );
 }
-
-const deviceHeight = Dimensions.get("window").height;
 
 const styles = StyleSheet.create({
   screen: {

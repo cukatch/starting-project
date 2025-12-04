@@ -3,25 +3,31 @@ import {
   StyleSheet,
   Text,
   View,
-  Dimensions,
   useWindowDimensions,
   ScrollView,
 } from "react-native";
+
 import Title from "../components/ui/Title";
-import Colors from "../constants/colors";
 import PrimaryButton from "../components/ui/PrimaryButton";
+import Colors from "../constants/colors";
+
+const DEFAULT_IMAGE_SIZE = 300;
+const SMALL_IMAGE_SIZE = 150;
+const TINY_IMAGE_SIZE = 80;
+const SMALL_WIDTH_THRESHOLD = 380;
+const SMALL_HEIGHT_THRESHOLD = 480;
 
 function GameOverScreen({ roundNumber, userNumber, onStartNewGame }) {
   const { width, height } = useWindowDimensions();
 
-  let imageSize = 300;
+  let imageSize = DEFAULT_IMAGE_SIZE;
 
-  if (width < 380) {
-    imageSize = 150;
+  if (width < SMALL_WIDTH_THRESHOLD) {
+    imageSize = SMALL_IMAGE_SIZE;
   }
 
-  if (height < 480) {
-    imageSize = 80;
+  if (height < SMALL_HEIGHT_THRESHOLD) {
+    imageSize = TINY_IMAGE_SIZE;
   }
 
   const imageStyle = {
@@ -62,9 +68,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   imageContainer: {
-    //rwidth: deviceWidth < 380 ? 150 : 300,
-    //height: deviceWidth < 380 ? 150 : 300,
-    //borderRadius: deviceWidth < 380 ? 75 : 150,
     borderWidth: 3,
     borderColor: Colors.primary800,
     overflow: "hidden",

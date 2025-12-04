@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -5,93 +6,111 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+
 import Title from "../components/ui/Title";
 import PrimaryButton from "../components/ui/PrimaryButton";
-import { useEffect, useState } from "react";
 import NumberContainer from "../components/game/NumberContainer";
 import InstructionText from "../components/ui/InstructionText";
 import Card from "../components/ui/Card";
-import { Ionicons } from "@expo/vector-icons";
 import GuessLogItem from "../components/game/GuessLogItem";
+
+const MIN_BOUNDARY = 1;
+const MAX_BOUNDARY = 100;
+const NARROW_SCREEN_WIDTH = 500;
+const ICON_SIZE = 24;
+const ICON_COLOR = "white";
 
 function generateRandomBetween(min, max, exclude) {
   const rndNum = Math.floor(Math.random() * (max - min)) + min;
 
   if (rndNum === exclude) {
     return generateRandomBetween(min, max, exclude);
-  } else {
-    return rndNum;
   }
+  return rndNum;
 }
 
-let minBound = 1;
-let maxBound = 100;
+let minBound = MIN_BOUNDARY;
+let maxBound = MAX_BOUNDARY;
 
 function GameScreen({ selected, onGameOver }) {
-  const initialGuess = generateRandomBetween(1, 100, selected);
+  const initialGuess = generateRandomBetween(
+    MIN_BOUNDARY,
+    MAX_BOUNDARY,
+    selected
+  );
   const [currentGuess, setCurrentGuess] = useState(initialGuess);
   const [guessRounds, setGuessRounds] = useState([initialGuess]);
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
+  const guessRoundsListLength = guessRounds.length;
 
   useEffect(() => {
     if (currentGuess === selected) {
-      onGameOver(guessRoundsListLength + 1);
+      onGameOver(guessRoundsListLength);
     }
-  }, [currentGuess, selected, onGameOver]);
+  }, [currentGuess, selected, onGameOver, guessRoundsListLength]);
 
   useEffect(() => {
-    minBound = 1;
-    maxBound = 100;
+    minBound = MIN_BOUNDARY;
+    maxBound = MAX_BOUNDARY;
   }, []);
 
-  function nextGeussHandler(direction) {
-    if (
-      (direction === "lower" && currentGuess < selected) ||
-      (direction === "higher" && currentGuess > selected)
-    ) {
-      Alert.alert("Don't lie!", "You know this was wrong...", [
-        { text: "Sorry!", style: "cancel" },
+  const nextGuessHandler = useCallback(
+    (direction) => {
+      const isInvalidLower = direction === "lower" && currentGuess < selected;
+      const isInvalidHigher = direction === "higher" && currentGuess > selected;
+
+      if (isInvalidLower || isInvalidHigher) {
+        Alert.alert("Don't lie!", "You know this was wrong...", [
+          { text: "Sorry!", style: "cancel" },
+        ]);
+        return;
+      }
+
+      if (direction === "lower") {
+        maxBound = currentGuess;
+      } else {
+        minBound = currentGuess + 1;
+      }
+
+      const newRandomNumber = generateRandomBetween(
+        minBound,
+        maxBound,
+        currentGuess
+      );
+      setCurrentGuess(newRandomNumber);
+      setGuessRounds((prevGuessRounds) => [
+        newRandomNumber,
+        ...prevGuessRounds,
       ]);
-      return;
-    }
-
-    if (direction === "lower") {
-      maxBound = currentGuess;
-    } else {
-      minBound = currentGuess + 1;
-    }
-
-    const newRandNumber = generateRandomBetween(
-      minBound,
-      maxBound,
-      currentGuess
-    );
-    setCurrentGuess(newRandNumber);
-    setGuessRounds((prevGuessRounds) => [newRandNumber, ...prevGuessRounds]);
-  }
-
-  const guessRoundsListLength = guessRounds.length;
+    },
+    [currentGuess, selected]
+  );
 
   let content = (
     <>
       <NumberContainer>{currentGuess}</NumberContainer>
       <Card>
-        <InstructionText style={styles.instructonProp}>
+        <InstructionText style={styles.instructionText}>
           Higher or lower?
         </InstructionText>
         <View style={styles.buttonsContainer}>
           <View style={styles.buttonContainer}>
-            <PrimaryButton onPress={nextGeussHandler.bind(this, "lower")}>
+            <PrimaryButton onPress={() => nextGuessHandler("lower")}>
               <Ionicons
                 name="remove-circle-outline"
-                size={24}
-                color={"white"}
+                size={ICON_SIZE}
+                color={ICON_COLOR}
               />
             </PrimaryButton>
           </View>
           <View style={styles.buttonContainer}>
-            <PrimaryButton onPress={nextGeussHandler.bind(this, "higher")}>
-              <Ionicons name="add-circle-outline" size={24} color={"white"} />
+            <PrimaryButton onPress={() => nextGuessHandler("higher")}>
+              <Ionicons
+                name="add-circle-outline"
+                size={ICON_SIZE}
+                color={ICON_COLOR}
+              />
             </PrimaryButton>
           </View>
         </View>
@@ -99,26 +118,30 @@ function GameScreen({ selected, onGameOver }) {
     </>
   );
 
-  if (width < 500) {
+  if (width < NARROW_SCREEN_WIDTH) {
     content = (
       <>
-        <InstructionText style={styles.instructonProp}>
+        <InstructionText style={styles.instructionText}>
           Higher or lower?
         </InstructionText>
         <View style={styles.buttonContainerWide}>
           <View style={styles.buttonContainer}>
-            <PrimaryButton onPress={nextGeussHandler.bind(this, "lower")}>
+            <PrimaryButton onPress={() => nextGuessHandler("lower")}>
               <Ionicons
                 name="remove-circle-outline"
-                size={24}
-                color={"white"}
+                size={ICON_SIZE}
+                color={ICON_COLOR}
               />
             </PrimaryButton>
           </View>
           <NumberContainer>{currentGuess}</NumberContainer>
           <View style={styles.buttonContainer}>
-            <PrimaryButton onPress={nextGeussHandler.bind(this, "higher")}>
-              <Ionicons name="add-circle-outline" size={24} color={"white"} />
+            <PrimaryButton onPress={() => nextGuessHandler("higher")}>
+              <Ionicons
+                name="add-circle-outline"
+                size={ICON_SIZE}
+                color={ICON_COLOR}
+              />
             </PrimaryButton>
           </View>
         </View>
@@ -158,17 +181,17 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flex: 1,
   },
-  instructonProp: {
+  instructionText: {
     marginBottom: 10,
   },
   listContainer: {
     flex: 1,
     padding: 16,
-  }, 
+  },
   buttonContainerWide: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  }
+    flexDirection: "row",
+    alignItems: "center",
+  },
 });
 
 export default GameScreen;
