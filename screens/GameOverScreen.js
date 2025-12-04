@@ -34,7 +34,7 @@ function GameOverScreen({ roundNumber, userNumber, onStartNewGame }) {
     <ScrollView style={styles.screen}>
       <View style={styles.rootContainer}>
         <Title>GAME OVER BRO!!</Title>
-        <View style={[styles.imageContainer, imageSize]}>
+        <View style={[styles.imageContainer, imageStyle]}>
           <Image
             source={require("../assets/images/success.png")}
             style={styles.image}
@@ -53,6 +53,7 @@ function GameOverScreen({ roundNumber, userNumber, onStartNewGame }) {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+    paddingTop: 48,
   },
   rootContainer: {
     flex: 1,
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
     margin: 36,
   },
   image: {
-    width: "!00%",
+    width: "100%",
     height: "100%",
   },
   summaryText: {

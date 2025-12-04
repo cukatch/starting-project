@@ -149,7 +149,8 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     padding: 24,
-    alignContent: "center",
+    paddingTop: 48,
+    alignItems: "center",
   },
   buttonsContainer: {
     flexDirection: "row",
